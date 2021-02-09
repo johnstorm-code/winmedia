@@ -292,7 +292,7 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd){
 	const UINT len = 100;
 	TCHAR dump[len];
 	long bitRate[] = { 11025, 22050, 44100, 48000, 88200, 96000, 176400, 192000 };
-	int bits[] = { 4, 8, 16, 24, 32, 64, 128 };
+	int bits[] = { 4, 8, 16, 24, 32, 64, 128, 256 };
 	LPCWSTR ch[] = { L"MONO", L"STEREO" };  //0 = 1ch, 1 = 2ch, etc
 	int maxChannels = 2;
 
@@ -310,8 +310,11 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd){
 					catout(L"\r\n", hWnd);
 				}
 				else if (hr == S_FALSE) {
+					// TODO: 
 					StringCbPrintf(dump, len * sizeof(TCHAR), format, (bitRate[rate] / 1000.0), bits[bit], ch[channel], GetWaveFormatString(WAVE_FORMAT_PCM), wfstate(hr));
 					catout(dump, hWnd);
+					catout(L"\r\n", hWnd);
+					catout(MixFormatToString(&match), hWnd);
 					catout(L"\r\n", hWnd);
 				}
 			}
@@ -340,11 +343,6 @@ LPCWSTR IMMDevicesApi::wfstate(HRESULT hr) {
 	return L"";
 }
 // https://docs.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclient-initialize
-HRESULT IMMDevicesApi::Initialize(AUDCLNT_SHAREMODE  ShareMode,
-	DWORD StreamFlags,
-	REFERENCE_TIME hnsBufferDuration,
-	REFERENCE_TIME hnsPeriodicity,
-	const WAVEFORMATEX* pFormat,
-	LPCGUID AudioSessionGuid){
+HRESULT IMMDevicesApi::Initialize(AUDCLNT_SHAREMODE  ShareMode,	DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX* pFormat, LPCGUID AudioSessionGuid){
 	return IMMAudioClientApi::Initialize(ShareMode, StreamFlags, hnsBufferDuration, hnsPeriodicity, pFormat, AudioSessionGuid);
 }

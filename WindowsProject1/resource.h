@@ -14,6 +14,7 @@
 #define IDR_MAINFRAME                   128
 #define IDR_CONTROLS1                   134
 #define IDC_BUTTON1                     145
+#define IDC_BUTTON2						148
 #define IDC_EDIT1                       146
 #define IDC_EDIT2                       147
 #define IDC_COMBOBOX1                   245

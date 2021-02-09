@@ -22,3 +22,4 @@
 #include <strsafe.h>
 #include <Audioclient.h>
 #include <audiopolicy.h>
+#include <ShObjIdl.h>
