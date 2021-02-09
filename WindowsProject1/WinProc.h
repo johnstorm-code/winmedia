@@ -149,20 +149,20 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				IMMDevices.DumpDeviceProps(hwnd, index);
 				break;
 			}
-		break;
+			break;
 		case IDM_ABOUT:
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, MyAbout);
-		break;
+			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
-		break;
+			break;
 		case IDC_EDIT1:
 			switch (nCode) 
 			{
 			case EN_SETFOCUS:
 				break;
 			}
-		break;
+			break;
 		case IDC_BUTTON1: {
 			HWND hwnd = GetDlgItem(hWnd, IDC_COMBOBOX1);
 			UINT index = SendMessage(hwnd, CB_GETCURSEL, 0, 0);
@@ -176,7 +176,6 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			{
 				// Activate the AUDIO Client for the device
 				IMMDevices.ActivateAudioClient();
-				// Print some Settings about it (these can be done before init)
 				LPCWSTR buff = IMMDevices.GetAudioClientDevicePeriod();
 				catout(L"AudioClientDevicePeriod: ", hwnd);
 				catout(buff, hwnd);
