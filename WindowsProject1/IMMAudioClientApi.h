@@ -13,6 +13,7 @@ public:
 	HRESULT GetDevicePeriod(REFERENCE_TIME* rtdefault, REFERENCE_TIME* rtminimum);
 	WAVEFORMATEX* GetMixFormat();
 	REFERENCE_TIME GetStreamLatency();
+	HRESULT GetService(REFIID riid, IAudioRenderClient** _pRenderClient);
 	HRESULT Initialize(
 		AUDCLNT_SHAREMODE  ShareMode, 
 		DWORD StreamFlags, 

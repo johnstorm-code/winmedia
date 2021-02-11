@@ -161,6 +161,7 @@
     <ClInclude Include="IMMDeviceEnumerator.h" />
     <ClInclude Include="IMMDevices.h" />
     <ClInclude Include="IMMDevicesAPI.h" />
+    <ClInclude Include="IMMAudioRenderClientApi.h" />
     <ClInclude Include="NotificationClient.h" />
     <ClInclude Include="Register.h" />
     <ClInclude Include="Resource.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Controls.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="IMMAudioClientApi.cpp" />
+    <ClCompile Include="IMMAudioRenderClientApi.cpp" />
     <ClCompile Include="IMMDeviceApi.cpp" />
     <ClCompile Include="IMMDeviceCollectionApi.cpp" />
     <ClCompile Include="IMMDeviceEnumerator.cpp" />

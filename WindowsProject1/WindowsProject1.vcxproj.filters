@@ -78,6 +78,9 @@
     <ClInclude Include="IMMAudioClientApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
+    <ClInclude Include="IMMAudioRenderClientApi.h">
+      <Filter>Header Files\IMMDevicesAPI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Controls.cpp">
@@ -111,6 +114,9 @@
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
     <ClCompile Include="IMMAudioClientApi.cpp">
+      <Filter>Source Files\IMMDevicesAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="IMMAudioRenderClientApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
   </ItemGroup>

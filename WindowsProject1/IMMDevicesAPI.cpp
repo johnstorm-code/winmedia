@@ -137,6 +137,19 @@ HRESULT IMMDevicesApi::ActivateAudioClient() {
 	IMMAudioClientApi::LoadAudioClient(client);
 	return S_OK;
 }
+HRESULT IMMDevicesApi::GetRenderClientBuffer(UINT numFramesRequested, BYTE** ppData) 
+{
+	return IMMAudioRenderClientApi::GetBuffer(numFramesRequested, ppData);
+}
+HRESULT IMMDevicesApi::ReleaseRenderClientBuffer(UINT numFramesWritten, DWORD dwFlags) 
+{
+	return IMMAudioRenderClientApi::ReleaseBuffer(numFramesWritten, dwFlags);
+}
+UINT IMMDevicesApi::GetAudioClientBufferSizeRaw()
+{
+	UINT syze = IMMAudioClientApi::GetBufferSize();
+	return syze;
+}
 LPCWSTR IMMDevicesApi::GetAudioClientBufferSize() {
 	const UINT len = 20;
 	TCHAR* pszTxt = new TCHAR[len];
@@ -145,6 +158,11 @@ LPCWSTR IMMDevicesApi::GetAudioClientBufferSize() {
 	if (hr != S_OK) return L"";
 	return pszTxt;
 }
+UINT IMMDevicesApi::GetAudioClientCurrentPaddingRaw()
+{
+	UINT syze = IMMAudioClientApi::GetCurrentPadding();
+	return syze;
+}
 LPCWSTR IMMDevicesApi::GetAudioClientCurrentPadding() {
 	const UINT len = 20;
 	TCHAR* pszTxt = new TCHAR[len];
@@ -152,6 +170,11 @@ LPCWSTR IMMDevicesApi::GetAudioClientCurrentPadding() {
 	HRESULT hr = StringCbPrintf(pszTxt, len * sizeof(TCHAR), L"%d", syze);
 	if (hr != S_OK) return L"";
 	return pszTxt;
+}
+HRESULT IMMDevicesApi::GetAudioClientDevicePeriodRaw(REFERENCE_TIME *times[]) 
+{
+	HRESULT hr = IMMAudioClientApi::GetDevicePeriod(times[0], times[1]);
+	return hr;
 }
 LPCWSTR IMMDevicesApi::GetAudioClientDevicePeriod() {
 	REFERENCE_TIME rtd;
@@ -260,8 +283,13 @@ LRESULT IMMDevicesApi::DumpDeviceProps(HWND hwnd, UINT index)
 	}
 	return SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)dump);
 }
-HRESULT IMMDevicesApi::EnumEndpoints() {
+HRESULT IMMDevicesApi::EnumEndpoints() 
+{
 	return IMMDeviceCollectionApi::SetCollection(IMMDeviceEnumeratorApi::EnumAudioEndpoints());
+}
+REFERENCE_TIME IMMDevicesApi::GetAudioClientStreamLatencyRaw()
+{
+	return IMMAudioClientApi::GetStreamLatency();
 }
 LPCWSTR IMMDevicesApi::GetAudioClientStreamLatency() {
 	REFERENCE_TIME rtslat;
@@ -345,4 +373,17 @@ LPCWSTR IMMDevicesApi::wfstate(HRESULT hr) {
 // https://docs.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclient-initialize
 HRESULT IMMDevicesApi::Initialize(AUDCLNT_SHAREMODE  ShareMode,	DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX* pFormat, LPCGUID AudioSessionGuid){
 	return IMMAudioClientApi::Initialize(ShareMode, StreamFlags, hnsBufferDuration, hnsPeriodicity, pFormat, AudioSessionGuid);
+}
+HRESULT IMMDevicesApi::InitRenderClient() 
+{
+	IAudioRenderClient *_pRenderClient;
+	HRESULT hr = IMMAudioClientApi::GetService(__uuidof(IAudioRenderClient), &_pRenderClient);
+	IMMAudioRenderClientApi::Initialize(_pRenderClient);
+	return hr;
+}
+HRESULT IMMDevicesApi::Start() {
+	return IMMAudioClientApi::Start();
+}
+HRESULT IMMDevicesApi::Stop() {
+	return IMMAudioClientApi::Stop();
 }

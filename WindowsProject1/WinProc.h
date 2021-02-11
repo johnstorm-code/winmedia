@@ -14,6 +14,9 @@
 //
 
 IMMDevicesApi IMMDevices;
+DWORD* dat;
+DWORD size;
+DWORD align;
 
 LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -52,7 +55,7 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			{
 				COMDLG_FILTERSPEC rgSpec[] =
 				{
-					{ L"Audio", L"*.wav;*.mp3" }
+					{ L"Audio", L"*.wav" }
 				};
 				pFileOpen->SetFileTypes((sizeof(rgSpec) / sizeof(rgSpec[0])), rgSpec);
 				// Show the Open dialog box.
@@ -93,6 +96,8 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 								WORD nBlockAlign;
 								WORD nBitsPerSample;
 
+								// FACT, CUE, PLAYLIST, ASSOCIATED DATA LIST
+
 								// DATA CHUNK
 								BYTE data[4];
 								DWORD datasize;
@@ -120,13 +125,60 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 										fread(&TWAVEFORMAT.nBlockAlign, sizeof(WORD), 1, WAVEFILE);
 										fread(&TWAVEFORMAT.nBitsPerSample, sizeof(WORD), 1, WAVEFILE);
 										fread(TWAVEFORMAT.data, sizeof(BYTE), 4, WAVEFILE);
+										// IF 
 										// READ "data" CHUNK
-										if (memcmp(TWAVEFORMAT.data, "data", sizeof(BYTE)) == 0)
+										HWND hwnd = GetDlgItem(hWnd, IDC_EDIT2);
+										catout(pszFilePath, hwnd);
+										catout(L"\r\n", hwnd);
+										if (memcmp(TWAVEFORMAT.data, "data", sizeof(BYTE)) != 0)
+										{
+											catout(L"NON-PCM File or header has additional chunks to check for.\r\n", hwnd);
+										}
+										else
 										{
 											fread(&TWAVEFORMAT.datasize, sizeof(DWORD), 1, WAVEFILE);
-											TWAVEFORMAT.datasize;
-											// GET DATA
+											float time = (float)TWAVEFORMAT.riffsize / ((float)TWAVEFORMAT.nSamplesPerSec * (float)TWAVEFORMAT.nChannels * ((float)TWAVEFORMAT.nBitsPerSample / 8));
+											TCHAR formatex[2000];
+											StringCbPrintf(formatex, 2000*sizeof(TCHAR),
+												L"%c%c%c%c %d %c%c%c%c %c%c%c%c Size:%d Format:%d Channels:%d SamplesPerSec:%d AvgBytesPerSec:%d BlockAlign:%d BitsPerSample:%d SampleSize:%ld Time:%f\r\n",
+												TWAVEFORMAT.riff[0],
+												TWAVEFORMAT.riff[1],
+												TWAVEFORMAT.riff[2],
+												TWAVEFORMAT.riff[3],
+												TWAVEFORMAT.riffsize,
+												TWAVEFORMAT.riffwave[0],
+												TWAVEFORMAT.riffwave[1],
+												TWAVEFORMAT.riffwave[2],
+												TWAVEFORMAT.riffwave[3],
+												TWAVEFORMAT.fmt[0],
+												TWAVEFORMAT.fmt[1],
+												TWAVEFORMAT.fmt[2],
+												TWAVEFORMAT.fmt[3],
+												TWAVEFORMAT.fmtsize,
+												TWAVEFORMAT.wFormatTag,
+												TWAVEFORMAT.nChannels,
+												TWAVEFORMAT.nSamplesPerSec,
+												TWAVEFORMAT.nAvgBytesPerSec,
+												TWAVEFORMAT.nBlockAlign,
+												TWAVEFORMAT.nBitsPerSample,
+												TWAVEFORMAT.datasize,
+												time
+												);
+											catout(L"\t", hwnd);
+											catout(formatex, hwnd);
+											// Get Data
+											dat = (DWORD*)malloc(sizeof(DWORD) * TWAVEFORMAT.datasize);
+											if (dat == NULL) return MessageBox(hWnd, L"malloc() failed. ", L"Error", MB_OK);
+											fread(dat, sizeof(DWORD), TWAVEFORMAT.datasize, WAVEFILE);
+											size = TWAVEFORMAT.datasize;
+											align = TWAVEFORMAT.nBlockAlign;
+											// Use Data
+											// IDEA --- TODO
+											// IMMDevices.play(data); <-- this way???
+											// Free
+											//free(dat);
 										}
+										SendMessage(hwnd, EM_LINESCROLL, 0, SendMessage(hwnd, EM_GETLINECOUNT, 0, 0));
 									}
 								}
 							}
@@ -171,49 +223,92 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			// Set Device by selection on GUI
 			IMMDevices.GetDeviceByIndex(index);
 			
-			// Process Only Active 
+			// Process Only Active  (ENSURE it is active)
 			if(wcscmp(IMMDevices.GetState(),L"DEVICE_ACTIVE") == 0)
 			{
-				// Activate the AUDIO Client for the device
-				IMMDevices.ActivateAudioClient();
-				LPCWSTR buff = IMMDevices.GetAudioClientDevicePeriod();
-				catout(L"AudioClientDevicePeriod: ", hwnd);
-				catout(buff, hwnd);
-				catout(L"\r\n", hwnd);
-				catout(L"SUPPORTED: ", hwnd);
-				buff = IMMDevices.MixFormatToString(IMMDevices.GetAudioClientMixFormat());
-				catout(buff, hwnd);
-				catout(L"\r\n", hwnd);
-				IMMDevices.DumpAudioClientSupportedFormats(hwnd);
-				// Initialize the AUDIO engine
-				WAVEFORMATEX wf;
-				wf = IMMDevices.BuildWaveFormatEx(WAVE_FORMAT_PCM, 2, 16, 44100);
-				if (IMMDevices.Initialize(AUDCLNT_SHAREMODE_SHARED, 0, 1000, 0, &wf, NULL) == S_OK)
-				{
-					// Print stuff (these can only be done after init)
-					buff = IMMDevices.GetAudioClientBufferSize();
-					catout(L"AudioClientBufferSize: ", hwnd);
-					catout(buff, hwnd);
-					catout(L"\r\n", hwnd);
-					buff = IMMDevices.GetAudioClientStreamLatency();
-					catout(L"AudioClientStreamLatency: ", hwnd);
-					catout(buff, hwnd);
-					catout(L"\r\n", hwnd);
-					buff = IMMDevices.GetAudioClientDevicePeriod();
+				// ENSURE IT IS A RENDER DEVICE
+				if (wcscmp(IMMDevices.GetDeviceDataFlow(), L"eRender") == 0) {
+
+					// Activate the AUDIO Client for the device
+					IMMDevices.ActivateAudioClient();
+					LPCWSTR buff = IMMDevices.GetAudioClientDevicePeriod();
 					catout(L"AudioClientDevicePeriod: ", hwnd);
 					catout(buff, hwnd);
 					catout(L"\r\n", hwnd);
-					buff = IMMDevices.GetAudioClientCurrentPadding();
-					catout(L"AudioClientCurrentPadding: ", hwnd);
+					catout(L"SUPPORTED: ", hwnd);
+					buff = IMMDevices.MixFormatToString(IMMDevices.GetAudioClientMixFormat());
 					catout(buff, hwnd);
 					catout(L"\r\n", hwnd);
-					// TODO: IAudioRender
-					// TODO PLAY a wave file 
-					// http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
-				}
-				else {
-					catout(L"Format not supported!", hwnd);
-					catout(L"\r\n", hwnd);
+					// DEBUG STUFF to display all 
+					IMMDevices.DumpAudioClientSupportedFormats(hwnd);
+					// Initialize the AUDIO engine
+					WAVEFORMATEX wf;
+					// TODO  WAVEFORMAT from a file
+					wf = IMMDevices.BuildWaveFormatEx(WAVE_FORMAT_PCM, 2, 16, 44100);
+					if (IMMDevices.Initialize(AUDCLNT_SHAREMODE_SHARED, 0, 1000, 0, &wf, NULL) == S_OK)
+					{
+						// Print stuff (these can only be done after init)
+						buff = IMMDevices.GetAudioClientBufferSize();
+						catout(L"AudioClientBufferSize: ", hwnd);
+						catout(buff, hwnd);
+						catout(L"\r\n", hwnd);
+						buff = IMMDevices.GetAudioClientStreamLatency();
+						catout(L"AudioClientStreamLatency: ", hwnd);
+						catout(buff, hwnd);
+						catout(L"\r\n", hwnd);
+						buff = IMMDevices.GetAudioClientDevicePeriod();
+						catout(L"AudioClientDevicePeriod: ", hwnd);
+						catout(buff, hwnd);
+						catout(L"\r\n", hwnd);
+						buff = IMMDevices.GetAudioClientCurrentPadding();
+						catout(L"AudioClientCurrentPadding: ", hwnd);
+						catout(buff, hwnd);
+						catout(L"\r\n", hwnd);
+						// INIT: IAudioRender
+						if (IMMDevices.InitRenderClient() == S_OK) {
+							UINT buffersize = IMMDevices.GetAudioClientBufferSizeRaw();
+							BYTE* pData;
+							// INITIALIZE (essentially silence the start of stream)
+							IMMDevices.GetRenderClientBuffer(buffersize, &pData);
+							memcpy_s(pData, buffersize,0,0);
+							IMMDevices.ReleaseRenderClientBuffer(buffersize, 0);
+							REFERENCE_TIME hnsActualDuration = (double)10000000 * buffersize / 44100;
+
+							// START audio rendering
+							IMMDevices.Start();
+
+							UINT framesProcessed = 0;
+							UINT ptr = 0;
+
+
+							// PLAY THE FILE buffer
+							for (; framesProcessed < size;) {
+								// Per the Example 
+								Sleep((DWORD)(hnsActualDuration / 10000 / 2));
+								UINT pad = IMMDevices.GetAudioClientCurrentPaddingRaw();
+								UINT framesAvailable = buffersize - pad;
+								IMMDevices.GetRenderClientBuffer(framesAvailable, &pData);
+								memcpy_s(pData, framesAvailable*align, &dat[ptr], framesAvailable*align);
+								framesProcessed += framesAvailable;
+								ptr += framesAvailable;
+								IMMDevices.ReleaseRenderClientBuffer(framesAvailable, 0);
+							}
+							Sleep((DWORD)(hnsActualDuration / 10000 / 2));
+
+							if (dat != NULL) {
+								free(dat);
+								dat = NULL;
+							}
+
+
+							// STOP RENDERING
+							IMMDevices.Stop();
+						}
+					}
+					else {
+						catout(L"Format not supported!", hwnd);
+						catout(L"\r\n", hwnd);
+					}
 				}
 			}
 			else {

@@ -47,6 +47,13 @@ REFERENCE_TIME IMMAudioClientApi::GetStreamLatency() {
 	if (hr != S_OK) throw "ERROR: GetStreamLatency() IAudioClient loaded but not initialized!";
 	return reftime;
 }
+HRESULT IMMAudioClientApi::GetService(REFIID riid, IAudioRenderClient **_pRenderClient) {
+	__objState__();
+	IAudioRenderClient* client;
+	HRESULT hr = this->_pAudioClient->GetService(riid, (void**)&client);
+	if (hr == S_OK) (*_pRenderClient) = client;
+	return hr;
+}
 HRESULT IMMAudioClientApi::Initialize(
 	AUDCLNT_SHAREMODE  ShareMode,
 	DWORD StreamFlags,
