@@ -9,11 +9,11 @@
 #include "resource.h"
 #include "Constants.h"
 #include "Declarations.h"
+#include "RegisterWindow.h"
+#include "Application.h"
 #include "UI.h"
 #include "IMMDevicesAPI.h"
 #include "WinProc.h"
-#include "Register.h"
-#include "Application.h"
 
 // Main Entry
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow){

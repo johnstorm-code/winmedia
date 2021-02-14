@@ -1,5 +1,9 @@
 	#pragma once
 
+/*
+https://docs.microsoft.com/en-us/windows/win32/api/mmdeviceapi/nn-mmdeviceapi-immnotificationclient
+*/
+
 #include "NotificationClient.h"
 #include "resource.h"
 #include "Functions.h"
@@ -8,24 +12,31 @@
 #include "IMMDeviceApi.h"
 #include "IPropertyStoreApi.h"
 
-class ThroughSelect {
+class ThroughSelect
+{
 	IMMDeviceCollectionApi _ODeviceCollectionApi;
 	IMMDeviceApi _ODeviceApi;
 	IPropertyStoreApi _OPropStoreApi;
 	TCHAR _log[220];
 public:
 	ThroughSelect() : _log{ NULL } {}
-	void Init(IMMDeviceCollection*collection) {
+	void Init(IMMDeviceCollection*collection)
+	{
 		if (collection == NULL) return;	
 		_ODeviceCollectionApi.SetCollection(collection);
 	}
-	LPCWSTR ChangeCombobox(HWND combo, LPCWSTR pwstrDeviceId) {
-		for (UINT i = 0; i < _ODeviceCollectionApi.GetCount(); i++) {
+	LPCWSTR ChangeCombobox(HWND combo, LPCWSTR pwstrDeviceId)
+	{
+		for (register UINT i = 0; i < _ODeviceCollectionApi.GetCount(); i++)
+		{
 			_ODeviceApi.SetDevice(_ODeviceCollectionApi.GetItem(i));
-			if (wcscmp(_ODeviceApi.GetId(), pwstrDeviceId) == 0) {
+			if (wcscmp(_ODeviceApi.GetId(), pwstrDeviceId) == 0)
+			{
 				_OPropStoreApi.SetPropStore(_ODeviceApi.OpenPropertyStore());
-				for (UINT j = 0; j < _OPropStoreApi.GetCount(); j++) {
-					if (_OPropStoreApi.GetAt(j) == PKEY_Device_FriendlyName) {
+				for (register UINT j = 0; j < _OPropStoreApi.GetCount(); j++)
+				{
+					if (_OPropStoreApi.GetAt(j) == PKEY_Device_FriendlyName)
+					{
 						SendMessage(combo, CB_DELETESTRING, i, 0);
 						SendMessage(combo, CB_INSERTSTRING, i, (LPARAM)_OPropStoreApi.GetValue(_OPropStoreApi.GetAt(j)).pwszVal);
 						SendMessage(combo, CB_SETCURSEL, i, 0);
@@ -36,13 +47,18 @@ public:
 		}
 		return L"";
 	}
-	LPCWSTR GetDeviceFriendlyName(LPCWSTR pwstrDeviceId) {
-		for (UINT i = 0; i < _ODeviceCollectionApi.GetCount(); i++) {
+	LPCWSTR GetDeviceFriendlyName(LPCWSTR pwstrDeviceId)
+	{
+		for (register UINT i = 0; i < _ODeviceCollectionApi.GetCount(); i++)
+		{
 			_ODeviceApi.SetDevice(_ODeviceCollectionApi.GetItem(i));
-			if (wcscmp(_ODeviceApi.GetId(), pwstrDeviceId) == 0) {
+			if (wcscmp(_ODeviceApi.GetId(), pwstrDeviceId) == 0) 
+			{
 				_OPropStoreApi.SetPropStore(_ODeviceApi.OpenPropertyStore());
-				for (UINT j = 0; j < _OPropStoreApi.GetCount(); j++) {
-					if (_OPropStoreApi.GetAt(j) == PKEY_Device_FriendlyName) {
+				for (register UINT j = 0; j < _OPropStoreApi.GetCount(); j++)
+				{
+					if (_OPropStoreApi.GetAt(j) == PKEY_Device_FriendlyName)
+					{
 						return _OPropStoreApi.GetValue(_OPropStoreApi.GetAt(j)).pwszVal;
 					}
 				}
@@ -50,7 +66,8 @@ public:
 		}
 		return L"";
 	}
-	void log(LPCWSTR status, LPCWSTR log, HWND hwnd) {
+	void log(LPCWSTR status, LPCWSTR log, HWND hwnd)
+	{
 		wcscpy_s(_log, L"");
 		wcscat_s(_log, status);
 		wcscat_s(_log, L" ");

@@ -2,7 +2,8 @@
 
 #include "IMMDevices.h"
 
-class IMMDeviceApi {
+class IMMDeviceApi
+{
 private:
 	IMMDevice* _pDevice;
 	BOOL __objState__();

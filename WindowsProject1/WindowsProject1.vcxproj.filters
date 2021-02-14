@@ -39,9 +39,6 @@
     <ClInclude Include="WinProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Register.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -81,6 +78,12 @@
     <ClInclude Include="IMMAudioRenderClientApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
+    <ClInclude Include="IMMAudioCaptureClientApi.h">
+      <Filter>Header Files\IMMDevicesAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Controls.cpp">
@@ -117,6 +120,9 @@
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
     <ClCompile Include="IMMAudioRenderClientApi.cpp">
+      <Filter>Source Files\IMMDevicesAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="IMMAudioCaptureClientApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
   </ItemGroup>

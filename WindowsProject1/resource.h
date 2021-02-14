@@ -13,12 +13,15 @@
 #define IDC_WINDOWSPROJECT1             109
 #define IDR_MAINFRAME                   128
 #define IDR_CONTROLS1                   134
+#define IDC_BUTTON3						135
+#define IDC_CHECKBOX1					136
 #define IDC_BUTTON1                     145
 #define IDC_BUTTON2						148
 #define IDC_EDIT1                       146
 #define IDC_EDIT2                       147
 #define IDC_COMBOBOX1                   245
 #define IDC_STATIC                      -1
+#define IDC_STATIC1						106
 
 // Next default values for new objects
 // 

@@ -11,7 +11,8 @@ class IMMDevicesApi:
 private IMMDeviceEnumeratorApi,
 private IMMDeviceCollectionApi, 
 private IMMAudioClientApi,
-private IMMAudioRenderClientApi {
+private IMMAudioRenderClientApi
+{
 private:
 	IMMDeviceApi _oDevice;
 	IPropertyStoreApi _oDeviceProps;
@@ -58,4 +59,5 @@ public:
 	HRESULT ReleaseRenderClientBuffer(UINT numFramesWritten, DWORD dwFlags);
 	HRESULT Start();
 	HRESULT Stop();
+	HRESULT Reset();
 };

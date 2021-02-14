@@ -1,10 +1,10 @@
 #pragma once
 
 #include "IMMDevices.h"
-
 #include "NotificationClient.h"
 
-class IMMDeviceEnumeratorApi {
+class IMMDeviceEnumeratorApi
+{
 private:
 	IMMDeviceEnumerator* _pEnumerator;
 	BOOL __objState__();

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "framework.h"
+#include "IMMDevices.h"
 
-class IMMAudioClientApi {
+class IMMAudioClientApi
+{
+private:
 	IAudioClient* _pAudioClient;
 	BOOL __objState__();
 public:

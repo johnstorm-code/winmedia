@@ -1,5 +1,4 @@
 #include "IMMDevicesAPI.h"
-
 #include "Functions.h"
 
 IMMDevicesApi::IMMDevicesApi()
@@ -12,19 +11,19 @@ IMMDevicesApi::IMMDevicesApi()
 IMMDevicesApi::~IMMDevicesApi() {}
 HRESULT IMMDevicesApi::RegisterNotifictionClient(HWND hWnd)
 {
-	if (!IMMDeviceEnumeratorApi::Initialized()) throw IMMDeviceEnumerator_NOT_INITIALIZED;
 	_oDeviceNotifyClient.caller(hWnd, IMMDeviceEnumeratorApi::ENUMERATOR());
 	return IMMDeviceEnumeratorApi::RegisterEndpointNotificationCallback(&_oDeviceNotifyClient);
 }
-HRESULT IMMDevicesApi::UnregisterNotifictionClient() {
-	if (!IMMDeviceEnumeratorApi::Initialized()) throw IMMDeviceEnumerator_NOT_INITIALIZED;
+HRESULT IMMDevicesApi::UnregisterNotifictionClient() 
+{
 	return IMMDeviceEnumeratorApi::UnregisterEnpointNotificationCallback(&_oDeviceNotifyClient);
 }
 UINT IMMDevicesApi::Count()
 {
 	return IMMDeviceCollectionApi::GetCount();
 }
-LPCWSTR IMMDevicesApi::GetDeviceDataFlow() {
+LPCWSTR IMMDevicesApi::GetDeviceDataFlow() 
+{
 	return this->_oDevice.GetDataFlow();
 }
 IMMDevicesApi* IMMDevicesApi::GetDefaultDevice(EDataFlow flow, ERole role)
@@ -176,7 +175,8 @@ HRESULT IMMDevicesApi::GetAudioClientDevicePeriodRaw(REFERENCE_TIME *times[])
 	HRESULT hr = IMMAudioClientApi::GetDevicePeriod(times[0], times[1]);
 	return hr;
 }
-LPCWSTR IMMDevicesApi::GetAudioClientDevicePeriod() {
+LPCWSTR IMMDevicesApi::GetAudioClientDevicePeriod()
+{
 	REFERENCE_TIME rtd;
 	REFERENCE_TIME rtm;
 	HRESULT hr = IMMAudioClientApi::GetDevicePeriod(&rtd, &rtm);
@@ -186,7 +186,8 @@ LPCWSTR IMMDevicesApi::GetAudioClientDevicePeriod() {
 	if (hr != S_OK) return L"";
 	return pszTxt;
 }
-LPCWSTR IMMDevicesApi::MixFormatToString(WAVEFORMATEX* pFormat) {
+LPCWSTR IMMDevicesApi::MixFormatToString(WAVEFORMATEX* pFormat)
+{
 	UINT len = 200;
 	TCHAR* wfm = new TCHAR[len];
 	LPCTSTR format = TEXT("Type: %s, Channels: %d, SamplesPerSec: %d, AvgBytesPerSec: %d, BlockAlign: %d, BitsPerSample: %d, cbSize:  %d");
@@ -202,12 +203,14 @@ LPCWSTR IMMDevicesApi::MixFormatToString(WAVEFORMATEX* pFormat) {
 	return wfm;
 }
 // https://docs.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex
-WAVEFORMATEX *IMMDevicesApi::GetAudioClientMixFormat() {
+WAVEFORMATEX *IMMDevicesApi::GetAudioClientMixFormat()
+{
 	WAVEFORMATEX* wfmtex;
 	wfmtex = IMMAudioClientApi::GetMixFormat();
 	return wfmtex;
 }
-HRESULT IMMDevicesApi::AudioClientIsFormatSupported(AUDCLNT_SHAREMODE  ShareMode, const WAVEFORMATEX* pFormat, WAVEFORMATEX *ppClosestMatch){
+HRESULT IMMDevicesApi::AudioClientIsFormatSupported(AUDCLNT_SHAREMODE  ShareMode, const WAVEFORMATEX* pFormat, WAVEFORMATEX *ppClosestMatch)
+{
 	WAVEFORMATEX* pClosestMatch;
 	HRESULT hr = IMMAudioClientApi::IsFormatSupported(ShareMode, pFormat, &pClosestMatch);
 	if(pClosestMatch != NULL) (*ppClosestMatch) = *pClosestMatch;
@@ -232,7 +235,7 @@ LRESULT IMMDevicesApi::DumpDeviceProps(HWND hwnd, UINT index)
 	wcscat_s(dump, L"\r\n");
 	PROPERTYKEY Key;
 	PROPVARIANT propv;
-	for (DWORD i = 0; i < _oDeviceProps.GetCount(); i++)
+	for (register DWORD i = 0; i < _oDeviceProps.GetCount(); i++)
 	{
 		Key = _oDeviceProps.GetAt(i);
 		propv = _oDeviceProps.GetValue(Key);
@@ -291,7 +294,8 @@ REFERENCE_TIME IMMDevicesApi::GetAudioClientStreamLatencyRaw()
 {
 	return IMMAudioClientApi::GetStreamLatency();
 }
-LPCWSTR IMMDevicesApi::GetAudioClientStreamLatency() {
+LPCWSTR IMMDevicesApi::GetAudioClientStreamLatency()
+{
 	REFERENCE_TIME rtslat;
 	rtslat = IMMAudioClientApi::GetStreamLatency();
 	const UINT len = 20;
@@ -300,7 +304,8 @@ LPCWSTR IMMDevicesApi::GetAudioClientStreamLatency() {
 	if (hr != S_OK) return L"";
 	return pszTxt;
 }
-WAVEFORMATEX IMMDevicesApi::BuildWaveFormatEx(WORD formatTag, WORD nChannels, WORD bitsPerSample, DWORD samplesPerSecond) {
+WAVEFORMATEX IMMDevicesApi::BuildWaveFormatEx(WORD formatTag, WORD nChannels, WORD bitsPerSample, DWORD samplesPerSecond)
+{
 	WAVEFORMATEX wf;
 	wf.wFormatTag = formatTag;
 	wf.nChannels = nChannels;
@@ -311,7 +316,8 @@ WAVEFORMATEX IMMDevicesApi::BuildWaveFormatEx(WORD formatTag, WORD nChannels, WO
 	wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 	return wf;
 }
-LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd){
+LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd)
+{
 	WAVEFORMATEX wf;
 	WAVEFORMATEX match;
 	AUDCLNT_SHAREMODE mode = AUDCLNT_SHAREMODE_SHARED;
@@ -324,12 +330,14 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd){
 	LPCWSTR ch[] = { L"MONO", L"STEREO" };  //0 = 1ch, 1 = 2ch, etc
 	int maxChannels = 2;
 
+	SendMessage(hWnd, WM_SETTEXT, 0, 0);
+
 	/****************** Performs Query on PCM format support ************************/
-	for (int channel = 0; channel < maxChannels; channel++)
+	for (register int channel = 0; channel < maxChannels; channel++)
 	{
-		for (int bit = 0; bit < (sizeof(bits)/sizeof(bits[0])); bit++) 
+		for (register int bit = 0; bit < (sizeof(bits)/sizeof(bits[0])); bit++) 
 		{
-			for (int rate = 0; rate < (sizeof(bitRate)/sizeof(bitRate[0])); rate++) 
+			for (register int rate = 0; rate < (sizeof(bitRate)/sizeof(bitRate[0])); rate++) 
 			{
 				wf = BuildWaveFormatEx(WAVE_FORMAT_PCM, channel+1, bits[bit], bitRate[rate]);
 				if ((hr = AudioClientIsFormatSupported(mode, &wf, &match)) == S_OK) {
@@ -341,7 +349,7 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd){
 					// TODO: 
 					StringCbPrintf(dump, len * sizeof(TCHAR), format, (bitRate[rate] / 1000.0), bits[bit], ch[channel], GetWaveFormatString(WAVE_FORMAT_PCM), wfstate(hr));
 					catout(dump, hWnd);
-					catout(L"\r\n", hWnd);
+					catout(L"\r\n\t", hWnd);
 					catout(MixFormatToString(&match), hWnd);
 					catout(L"\r\n", hWnd);
 				}
@@ -350,7 +358,8 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd){
 	}
 	return S_OK;
 }
-LPCWSTR IMMDevicesApi::wfstate(HRESULT hr) {
+LPCWSTR IMMDevicesApi::wfstate(HRESULT hr) 
+{
 	switch (hr) {
 	case S_OK:
 		return (LPCWSTR)L"FORMAT_SUPPORTED";
@@ -371,7 +380,8 @@ LPCWSTR IMMDevicesApi::wfstate(HRESULT hr) {
 	return L"";
 }
 // https://docs.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclient-initialize
-HRESULT IMMDevicesApi::Initialize(AUDCLNT_SHAREMODE  ShareMode,	DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX* pFormat, LPCGUID AudioSessionGuid){
+HRESULT IMMDevicesApi::Initialize(AUDCLNT_SHAREMODE  ShareMode,	DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX* pFormat, LPCGUID AudioSessionGuid)
+{
 	return IMMAudioClientApi::Initialize(ShareMode, StreamFlags, hnsBufferDuration, hnsPeriodicity, pFormat, AudioSessionGuid);
 }
 HRESULT IMMDevicesApi::InitRenderClient() 
@@ -381,9 +391,15 @@ HRESULT IMMDevicesApi::InitRenderClient()
 	IMMAudioRenderClientApi::Initialize(_pRenderClient);
 	return hr;
 }
-HRESULT IMMDevicesApi::Start() {
+HRESULT IMMDevicesApi::Start()
+{
 	return IMMAudioClientApi::Start();
 }
-HRESULT IMMDevicesApi::Stop() {
+HRESULT IMMDevicesApi::Stop()
+{
 	return IMMAudioClientApi::Stop();
+}
+HRESULT IMMDevicesApi::Reset() 
+{
+	return IMMAudioClientApi::Reset();
 }

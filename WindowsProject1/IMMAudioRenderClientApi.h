@@ -1,8 +1,9 @@
 #pragma once
 
-#include "framework.h"
+#include "IMMDevices.h"
 
-class IMMAudioRenderClientApi {
+class IMMAudioRenderClientApi
+{
 private:
 	IAudioRenderClient* _pAudioRenderClient;
 public:

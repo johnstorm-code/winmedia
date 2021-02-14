@@ -9,7 +9,7 @@ void catout(LPCWSTR text, HWND hwnd) {
 	int tCount = wcslen(text);
 	int fCount = cCount + tCount;
 	//Allocate buffer to hold new concatenated string
-	TCHAR* fText = (TCHAR*)malloc(fCount * sizeof(TCHAR) + 2);
+	TCHAR* fText = (TCHAR*)calloc(fCount,  sizeof(TCHAR) + 2);
 	if (fText == NULL) return;
 	//Fill the buffer with the control's text
 	SendMessage(hwnd, WM_GETTEXT, cCount + 1, (LPARAM)fText);
