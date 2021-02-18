@@ -15,6 +15,8 @@
 #define IDR_CONTROLS1                   134
 #define IDC_BUTTON3						135
 #define IDC_CHECKBOX1					136
+#define IDC_BUTTON4						137
+#define IDC_TRACKBAR1					138
 #define IDC_BUTTON1                     145
 #define IDC_BUTTON2						148
 #define IDC_EDIT1                       146

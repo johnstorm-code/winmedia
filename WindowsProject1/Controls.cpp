@@ -64,3 +64,18 @@ HWND createStaticControlWindow(HWND parent, LPCWSTR bText, int x, int y, int wid
 		(HINSTANCE)GetWindowLongPtr(parent, GWLP_HINSTANCE),
 		NULL);      // Pointer not needed.
 }
+HWND createTrackbarControlWindow(HWND parent, int x, int y, int width, int height, int ctrlId, int xtra)
+{
+	return CreateWindowW(
+		TRACKBAR_CLASS,  // Predefined class; Unicode assumed 
+		NULL,      // Button text 
+		xtra | WS_EX_LEFT | WS_OVERLAPPED | WS_VISIBLE | WS_CHILD,  // Styles 
+		x,         // x position 
+		y,         // y position 
+		width,        // Button width
+		height,        // Button height
+		parent,     // Parent window
+		(HMENU)ctrlId,       // No menu.
+		(HINSTANCE)GetWindowLongPtr(parent, GWLP_HINSTANCE),
+		NULL);      // Pointer not needed.
+}

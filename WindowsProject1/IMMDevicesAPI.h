@@ -50,7 +50,7 @@ public:
 	LPCWSTR GetAudioClientStreamLatency();
 	REFERENCE_TIME GetAudioClientStreamLatencyRaw();
 	HRESULT AudioClientIsFormatSupported(AUDCLNT_SHAREMODE  ShareMode, const WAVEFORMATEX* pFormat, WAVEFORMATEX *ppClosestMatch);
-	LRESULT DumpAudioClientSupportedFormats(HWND hWnd);
+	LRESULT DumpAudioClientSupportedFormats(HWND hWnd, BOOL supportedonly);
 	LPCWSTR MixFormatToString(WAVEFORMATEX *pFormat);
 	HRESULT Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX* pFormat, LPCGUID AudioSessionGuid);
 	WAVEFORMATEX BuildWaveFormatEx(WORD formatTag, WORD nChannels, WORD bitsPerSample, DWORD samplesPerSecond);
@@ -60,4 +60,6 @@ public:
 	HRESULT Start();
 	HRESULT Stop();
 	HRESULT Reset();
+	BOOL IsAudioClientLoaded();
+	HRESULT UnregisterAudioClient();
 };

@@ -130,7 +130,10 @@ LPWSTR IMMDevicesApi::GetEnumeratorName()
 {
 	return KeyValue(PKEY_Device_EnumeratorName);
 }
-HRESULT IMMDevicesApi::ActivateAudioClient() {
+HRESULT IMMDevicesApi::ActivateAudioClient() 
+{
+	// AVOID re-activation and re-loading
+	if (IsAudioClientLoaded() == TRUE) return S_OK;
 	IAudioClient* client;
 	client = this->_oDevice.ActivateAudioClient(CLSCTX_ALL, NULL);
 	IMMAudioClientApi::LoadAudioClient(client);
@@ -316,7 +319,7 @@ WAVEFORMATEX IMMDevicesApi::BuildWaveFormatEx(WORD formatTag, WORD nChannels, WO
 	wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 	return wf;
 }
-LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd)
+LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd, BOOL supportedonly)
 {
 	WAVEFORMATEX wf;
 	WAVEFORMATEX match;
@@ -330,8 +333,6 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd)
 	LPCWSTR ch[] = { L"MONO", L"STEREO" };  //0 = 1ch, 1 = 2ch, etc
 	int maxChannels = 2;
 
-	SendMessage(hWnd, WM_SETTEXT, 0, 0);
-
 	/****************** Performs Query on PCM format support ************************/
 	for (register int channel = 0; channel < maxChannels; channel++)
 	{
@@ -340,18 +341,23 @@ LRESULT IMMDevicesApi::DumpAudioClientSupportedFormats(HWND hWnd)
 			for (register int rate = 0; rate < (sizeof(bitRate)/sizeof(bitRate[0])); rate++) 
 			{
 				wf = BuildWaveFormatEx(WAVE_FORMAT_PCM, channel+1, bits[bit], bitRate[rate]);
-				if ((hr = AudioClientIsFormatSupported(mode, &wf, &match)) == S_OK) {
+				if ((hr = AudioClientIsFormatSupported(mode, &wf, &match)) == S_OK)
+				{
 					StringCbPrintf(dump, len * sizeof(TCHAR), format, (bitRate[rate]/1000.0), bits[bit], ch[channel], GetWaveFormatString(WAVE_FORMAT_PCM), wfstate(hr));
 					catout(dump, hWnd);
 					catout(L"\r\n", hWnd);
 				}
-				else if (hr == S_FALSE) {
-					// TODO: 
-					StringCbPrintf(dump, len * sizeof(TCHAR), format, (bitRate[rate] / 1000.0), bits[bit], ch[channel], GetWaveFormatString(WAVE_FORMAT_PCM), wfstate(hr));
-					catout(dump, hWnd);
-					catout(L"\r\n\t", hWnd);
-					catout(MixFormatToString(&match), hWnd);
-					catout(L"\r\n", hWnd);
+				// FALSE indicates a format similar to what was requested
+				else if (hr == S_FALSE)
+				{
+					if (!supportedonly)
+					{
+						StringCbPrintf(dump, len * sizeof(TCHAR), format, (bitRate[rate] / 1000.0), bits[bit], ch[channel], GetWaveFormatString(WAVE_FORMAT_PCM), wfstate(hr));
+						catout(dump, hWnd);
+						catout(L"\r\n\t", hWnd);
+						catout(MixFormatToString(&match), hWnd);
+						catout(L"\r\n", hWnd);
+					}
 				}
 			}
 		}
@@ -402,4 +408,19 @@ HRESULT IMMDevicesApi::Stop()
 HRESULT IMMDevicesApi::Reset() 
 {
 	return IMMAudioClientApi::Reset();
+}
+BOOL IMMDevicesApi::IsAudioClientLoaded()
+{
+	return IMMAudioClientApi::Loaded();
+}
+HRESULT IMMDevicesApi::UnregisterAudioClient()
+{
+	if (IMMAudioClientApi::Loaded() == TRUE)
+	{
+		IMMAudioClientApi::~IMMAudioClientApi();
+	}
+	if (IMMAudioClientApi::Loaded() == FALSE) {
+		return S_OK;
+	}
+	return S_FALSE;
 }

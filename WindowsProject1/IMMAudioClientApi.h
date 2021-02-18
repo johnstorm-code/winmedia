@@ -29,4 +29,5 @@ public:
 	HRESULT Stop();
 	HRESULT LoadAudioClient(IAudioClient* _pAudioClient);
 	HRESULT SetEventHandle(HANDLE _pEventHandle);
+	BOOL Loaded();
 };

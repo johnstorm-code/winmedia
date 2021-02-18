@@ -23,3 +23,4 @@
 #include <Audioclient.h>
 #include <audiopolicy.h>
 #include <ShObjIdl.h>
+#include <cmath>

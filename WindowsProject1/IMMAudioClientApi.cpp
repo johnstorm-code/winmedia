@@ -113,7 +113,7 @@ HRESULT IMMAudioClientApi::Stop()
 {
 	__objState__();
 	HRESULT hr = this->_pAudioClient->Stop();
-	if (hr != S_OK) throw  hr;
+	if (hr != S_OK && hr != S_FALSE) throw  hr;
 	return hr;
 }
 // https://docs.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclient-seteventhandle
@@ -141,4 +141,11 @@ BOOL IMMAudioClientApi::__objState__()
 		return FALSE;
 	}
 	return TRUE;
+}
+BOOL IMMAudioClientApi::Loaded()
+{
+	if (this->_pAudioClient != NULL) {
+		return TRUE;
+	}
+	return FALSE;
 }
