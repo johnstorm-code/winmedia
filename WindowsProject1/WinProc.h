@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Functions.h"
 
@@ -25,182 +25,162 @@ DWORD sps;//samples per second 44100, 480000
 WORD frmat;//waveformat WAVE_FORMAT_PCM, etc
 BOOL loop = TRUE;//controls looping, start on
 BOOL play = FALSE;//controls playing
-float volume = 1.0f;//global control of volume
+float volume = 0.75f;//global control of volume // NOTE:  match the value in the control creation function
 HANDLE h[2];//handle to thread
 UINT timeout = 100;// thread timeout
 const UINT flen = 10;
 TCHAR frames[flen] = L"0";
 
-// Thread for File 
-DWORD WINAPI ThreadFnFile(LPVOID lParam) 
+// Load File - TODO: place this in it's own class
+HRESULT LoadWaveFile(LPCWSTR pszFilePath, HWND hWnd)
 {
-	HWND hWnd = (HWND)lParam;
-
-	IFileOpenDialog* pFileOpen =  NULL;
-	
-	HRESULT hr = CoInitialize(pFileOpen);
-	if (hr != S_OK) return -1;
-
-	hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-		__uuidof(IFileOpenDialog), reinterpret_cast<void**>(&pFileOpen));
-
-	if (SUCCEEDED(hr))
+	FILE* WAVEFILE;
+	_wfopen_s(&WAVEFILE, pszFilePath, L"rb");
+	if (WAVEFILE == NULL)
 	{
-		COMDLG_FILTERSPEC rgSpec[] = { { L"Audio", L"*.wav;.wave" } };
-		pFileOpen->SetFileTypes((sizeof(rgSpec) / sizeof(rgSpec[0])), rgSpec);
-		// Show the Open dialog box.
-		hr = pFileOpen->Show(hWnd);
+		return MessageBox(hWnd, L"Unable to open file!", L"Error", MB_OK);
+	}
 
-		// Get the file name from the dialog box.
-		if (SUCCEEDED(hr))
+	const UINT headsyze = 4;
+	BYTE head[headsyze] = { 0 };
+	while (true)
+	{
+		fread(head, sizeof(BYTE), headsyze, WAVEFILE);
+		if (memcmp(head, "RIFF", sizeof(BYTE)) == 0)
 		{
-			IShellItem* pItem;
-			hr = pFileOpen->GetResult(&pItem);
-			if (SUCCEEDED(hr))
-			{
-				PWSTR pszFilePath;
-				hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-				// OK GOT the FILE
-				if (SUCCEEDED(hr))
-				{
-					play = FALSE;
-					FILE* WAVEFILE;
-					_wfopen_s(&WAVEFILE, pszFilePath, L"rb");
-					if (WAVEFILE == NULL) return MessageBox(hWnd, L"Unable to open file!", L"Error", MB_OK);
-
-					// READ and ensure it's RIFF FILE
-					fread(TWAVEFORMAT.riff, sizeof(BYTE), 4, WAVEFILE);
-					if (memcmp(TWAVEFORMAT.riff, "RIFF", sizeof(BYTE)) == 0)
-					{
-						fread(&TWAVEFORMAT.riffsize, sizeof(DWORD), 1, WAVEFILE);
-
-						// READ and ensure it's a WAVE format
-						fread(TWAVEFORMAT.riffwave, sizeof(BYTE), 4, WAVEFILE);
-						if (memcmp(TWAVEFORMAT.riffwave, "WAVE", sizeof(BYTE)) == 0)
-						{
-							// READ "fmt " CHUNK
-							fread(TWAVEFORMAT.fmt, sizeof(BYTE), 4, WAVEFILE);
-							if (memcmp(TWAVEFORMAT.fmt, "fmt ", sizeof(BYTE)) == 0)
-							{
-								fread(&TWAVEFORMAT.fmtsize, sizeof(DWORD), 1, WAVEFILE);
-								fread(&TWAVEFORMAT.wFormatTag, sizeof(WORD), 1, WAVEFILE);
-								fread(&TWAVEFORMAT.nChannels, sizeof(WORD), 1, WAVEFILE);
-								fread(&TWAVEFORMAT.nSamplesPerSec, sizeof(DWORD), 1, WAVEFILE);
-								fread(&TWAVEFORMAT.nAvgBytesPerSec, sizeof(DWORD), 1, WAVEFILE);
-								fread(&TWAVEFORMAT.nBlockAlign, sizeof(WORD), 1, WAVEFILE);
-								fread(&TWAVEFORMAT.nBitsPerSample, sizeof(WORD), 1, WAVEFILE);
-
-								// TODO: OGG encoded wave file captured here but won't play
-								if (TWAVEFORMAT.wFormatTag != WAVE_FORMAT_PCM && TWAVEFORMAT.wFormatTag != WAVE_FORMAT_IEEE_FLOAT) {
-									BYTE sigbytes[11];
-									fread(&sigbytes, sizeof(BYTE), 10, WAVEFILE);
-								}
-								// Ignore anything in the file, except data
-								// // TODO: FACT, CUE, PLAYLIST, ASSOCIATED DATA LIST
-								while (true) {
-									fread(&TWAVEFORMAT.data, sizeof(BYTE), 4, WAVEFILE);
-									if (memcmp(TWAVEFORMAT.data, "data", sizeof(BYTE)) == 0) {
-										break;
-									}
-								}
-
-								HWND hwnd = GetDlgItem(hWnd, IDC_EDIT2);
-								catout(pszFilePath, hwnd);
-								catout(L"\r\n", hwnd);
-								if (memcmp(TWAVEFORMAT.data, "data", sizeof(BYTE)) != 0)
-								{
-									catout(L"NON-PCM File or header has additional chunks to check for.\r\n", hwnd);
-									HWND button3 = GetDlgItem(hWnd, IDC_BUTTON3);
-									EnableWindow(button3, FALSE);
-								}
-								else
-								{
-									fread(&TWAVEFORMAT.datasize, sizeof(DWORD), 1, WAVEFILE);
-									float time = (float)TWAVEFORMAT.riffsize / ((float)TWAVEFORMAT.nSamplesPerSec * (float)TWAVEFORMAT.nChannels * ((float)TWAVEFORMAT.nBitsPerSample / 8));
-									TCHAR formatex[256];
-									StringCbPrintf(formatex, 256 * sizeof(TCHAR),
-										L"%c%c%c%c %d %c%c%c%c %c%c%c%c Size:%d Format:%d Channels:%d SamplesPerSec:%d AvgBytesPerSec:%d BlockAlign:%d BitsPerSample:%d SampleSize:%ld Time:%f\r\n",
-										TWAVEFORMAT.riff[0],
-										TWAVEFORMAT.riff[1],
-										TWAVEFORMAT.riff[2],
-										TWAVEFORMAT.riff[3],
-										TWAVEFORMAT.riffsize,
-										TWAVEFORMAT.riffwave[0],
-										TWAVEFORMAT.riffwave[1],
-										TWAVEFORMAT.riffwave[2],
-										TWAVEFORMAT.riffwave[3],
-										TWAVEFORMAT.fmt[0],
-										TWAVEFORMAT.fmt[1],
-										TWAVEFORMAT.fmt[2],
-										TWAVEFORMAT.fmt[3],
-										TWAVEFORMAT.fmtsize,
-										TWAVEFORMAT.wFormatTag,
-										TWAVEFORMAT.nChannels,
-										TWAVEFORMAT.nSamplesPerSec,
-										TWAVEFORMAT.nAvgBytesPerSec,
-										TWAVEFORMAT.nBlockAlign,
-										TWAVEFORMAT.nBitsPerSample,
-										TWAVEFORMAT.datasize,
-										time
-									);
-									catout(L"\t", hwnd);
-									catout(formatex, hwnd);
-									// Free the file 
-									if (dat != NULL) {
-										free(dat);
-										dat = NULL;
-									}
-									// Get Data
-									UINT syize = TWAVEFORMAT.datasize;
-									dat = (DWORD*)calloc(TWAVEFORMAT.datasize, sizeof(DWORD));
-									if (dat == NULL) return MessageBox(hWnd, L"malloc() failed. ", L"Error", MB_OK);
-									fread(dat, sizeof(DWORD), syize, WAVEFILE);
-									size = TWAVEFORMAT.datasize;
-									align = TWAVEFORMAT.nBlockAlign;
-									channels = TWAVEFORMAT.nChannels;
-									bps = TWAVEFORMAT.nBitsPerSample;
-									sps = TWAVEFORMAT.nSamplesPerSec;
-									frmat = TWAVEFORMAT.wFormatTag;
-									HWND button3 = GetDlgItem(hWnd, IDC_BUTTON3);
-									EnableWindow(button3, TRUE);
-
-									// TODO/TEST: modify the data in some form
-									for (UINT index = 0; index < size/align; index++)
-									{
-										// Get a frame of data (4 bytes per block align)
-										DWORD frame = dat[index];
-										// Get bottom 2 bytes
-										WORD leftch = LOWORD(frame);
-										// Get upper 2 bytes
-										WORD rightch = HIWORD(frame);
-										// Get samples
-										// Note: _int16 to get the actual sample value
-										// Represented as double
-										double rsample = (_int16)leftch;
-										double lsample = (_int16)rightch;
-										// Modify the samples by adjusting amplitude
-										leftch = (WORD)(lsample * volume);
-										rightch = (WORD)(rsample * volume);
-										// Prepare packet
-										DWORD modifiedframe = MAKELONG(leftch, rightch);
-										// Write packet to frame buffer
-										dat[index] = modifiedframe;
-									}
-								}
-								SendMessage(hwnd, EM_LINESCROLL, 0, SendMessage(hwnd, EM_GETLINECOUNT, 0, 0));
-							}
-						}
-					}
-					_fcloseall();
-					CoTaskMemFree(pszFilePath);
-				}
-				pItem->Release();
-				pItem = NULL;
+			memcpy_s(TWAVEFORMAT.riff, headsyze*sizeof(BYTE), head, headsyze*sizeof(BYTE));
+			fread(&TWAVEFORMAT.riffsize, sizeof(DWORD), 1, WAVEFILE);
+		}
+		else if (memcmp(head, "WAVE", sizeof(BYTE)) == 0)
+		{
+			memcpy_s(TWAVEFORMAT.riffwave, headsyze*sizeof(BYTE), head, headsyze*sizeof(BYTE));
+		}
+		else if (memcmp(head, "fmt ", sizeof(BYTE)) == 0)
+		{
+			memcpy_s(TWAVEFORMAT.fmt, headsyze*sizeof(BYTE), head, headsyze*sizeof(BYTE));
+			fread(&TWAVEFORMAT.fmtsize, sizeof(DWORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.wFormatTag, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.nChannels, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.nSamplesPerSec, sizeof(DWORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.nAvgBytesPerSec, sizeof(DWORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.nBlockAlign, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.nBitsPerSample, sizeof(WORD), 1, WAVEFILE);
+			// TODO: OGG encoded wave file captured here but won't play
+			// TODO: libsndfile to do all messy work??  or spend ages learning as usual?
+			if (TWAVEFORMAT.wFormatTag != WAVE_FORMAT_PCM && TWAVEFORMAT.wFormatTag != WAVE_FORMAT_IEEE_FLOAT) {
+				BYTE sigbytes[11];
+				fread(&sigbytes, sizeof(BYTE), 10, WAVEFILE);
 			}
 		}
-		pFileOpen->Release();
-		pFileOpen = NULL;
+		else if (memcmp(head, "smpl", sizeof(BYTE)) == 0)
+		{
+			memcpy_s(TWAVEFORMAT.smpl, headsyze * sizeof(BYTE), head, headsyze * sizeof(BYTE));
+			fread(&TWAVEFORMAT.smplsize, sizeof(DWORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.manf, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.prod, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.smplperiod, sizeof(DWORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.midiunitynote, sizeof(DWORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.midipitchfrac, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.smptefmt, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.smpteoffset, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.nloops, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.smpldata, sizeof(WORD), 1, WAVEFILE);
+			fread(&TWAVEFORMAT.smplLoops, sizeof(WORD), 1, WAVEFILE);
+		}
+		else if (memcmp(head, "data", sizeof(BYTE)) == 0)
+		{
+			memcpy_s(TWAVEFORMAT.data, headsyze*sizeof(BYTE), head, headsyze*sizeof(BYTE));
+			fread(&TWAVEFORMAT.datasize, sizeof(DWORD), 1, WAVEFILE);
+			break;
+		}
+	}
+
+	HWND hwnd = GetDlgItem(hWnd, IDC_EDIT2);
+	catout(pszFilePath, hwnd);
+	catout(L"\r\n", hwnd);
+	float time = (float)TWAVEFORMAT.riffsize / ((float)TWAVEFORMAT.nSamplesPerSec * (float)TWAVEFORMAT.nChannels * ((float)TWAVEFORMAT.nBitsPerSample / 8));
+	TCHAR formatex[256];
+	StringCbPrintf(formatex, 256 * sizeof(TCHAR),
+		L"%c%c%c%c %d %c%c%c%c %c%c%c%c Size:%d Format:%d Channels:%d SamplesPerSec:%d AvgBytesPerSec:%d BlockAlign:%d BitsPerSample:%d SampleSize:%ld Time:%fs\r\n",
+		TWAVEFORMAT.riff[0],
+		TWAVEFORMAT.riff[1],
+		TWAVEFORMAT.riff[2],
+		TWAVEFORMAT.riff[3],
+		TWAVEFORMAT.riffsize,
+		TWAVEFORMAT.riffwave[0],
+		TWAVEFORMAT.riffwave[1],
+		TWAVEFORMAT.riffwave[2],
+		TWAVEFORMAT.riffwave[3],
+		TWAVEFORMAT.fmt[0],
+		TWAVEFORMAT.fmt[1],
+		TWAVEFORMAT.fmt[2],
+		TWAVEFORMAT.fmt[3],
+		TWAVEFORMAT.fmtsize,
+		TWAVEFORMAT.wFormatTag,
+		TWAVEFORMAT.nChannels,
+		TWAVEFORMAT.nSamplesPerSec,
+		TWAVEFORMAT.nAvgBytesPerSec,
+		TWAVEFORMAT.nBlockAlign,
+		TWAVEFORMAT.nBitsPerSample,
+		TWAVEFORMAT.datasize,
+		time
+	);
+	catout(L"\t", hwnd);
+	catout(formatex, hwnd);
+	// Free the file IF not freed previously
+	if (dat != NULL) {
+		free(dat);
+		dat = NULL;
+	}
+	// Get Data
+	UINT syize = TWAVEFORMAT.datasize;
+	dat = (DWORD*)calloc(syize, sizeof(DWORD));
+	if (dat == NULL) return MessageBox(hWnd, L"malloc() failed. ", L"Error", MB_OK);
+	fread(dat, sizeof(DWORD), syize, WAVEFILE);
+	size = syize;
+	align = TWAVEFORMAT.nBlockAlign;
+	channels = TWAVEFORMAT.nChannels;
+	bps = TWAVEFORMAT.nBitsPerSample;
+	sps = TWAVEFORMAT.nSamplesPerSec;
+	frmat = TWAVEFORMAT.wFormatTag;
+	EnableWindow(GetDlgItem(hWnd, IDC_BUTTON3), TRUE);
+	SendMessage(hwnd, EM_LINESCROLL, 0, SendMessage(hwnd, EM_GETLINECOUNT, 0, 0));
+	return S_OK;
+}
+
+// Thread for File 
+DWORD WINAPI ThreadFnFile(LPVOID lParam)
+{
+	HWND hWnd = (HWND)lParam;
+	IFileOpenDialog* pFileOpen =  NULL;
+
+	if (SUCCEEDED(CoInitialize(pFileOpen)))
+	{
+		if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, __uuidof(IFileOpenDialog), reinterpret_cast<void**>(&pFileOpen))))
+		{
+			COMDLG_FILTERSPEC rgSpec[] = { {L"Audio", L"*.wav;.wave"} };
+			pFileOpen->SetFileTypes((sizeof(rgSpec) / sizeof(rgSpec[0])), rgSpec);
+			if (SUCCEEDED(pFileOpen->Show(hWnd)))
+			{
+				IShellItem* pItem;
+				if (SUCCEEDED(pFileOpen->GetResult(&pItem)))
+				{
+					PWSTR pszFilePath;
+					// OK GOT the FILE
+					if (SUCCEEDED(pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
+					{
+						play = FALSE;
+						WaitForSingleObject(h[0], INFINITE);
+						LoadWaveFile(pszFilePath, hWnd);
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+					pItem = NULL;
+				}
+			}
+			pFileOpen->Release();
+			pFileOpen = NULL;
+		}
 	}
 	return 0;
 }
@@ -253,32 +233,44 @@ DWORD WINAPI ThreadFn(LPVOID lParam)
 
 	// PLAY THE FILE buffer
 	// NOTE:  Some notes on my understanding==
-	// Audio doesn't "play" all at one time.  "Fragments" of the audio data, 
-	// are processed at a time.  To the listener it seems the
-	// audio is playing all at once.  However, just like video is comprised of individual
+	// Audio doesn't play all at one time.  Fragments of the audio data are processed at a time.  
+	// To the listener it seems the audio is playing all at once.  
+	// However, just like video is comprised of individual
 	// images, this is somewhat a metaphor to how the audio api/card works.
 	// In this example here: the audio data is coming from a wav file that has been loaded
-	// into a global pointer, which is filled with audio data using calloc(), then
+	// into a global pointer, which is filled with audio data, using calloc() to acquire mem, then
 	// this data is read fragment by fragment and copied over via memcpy into the audio api
 	// audio buffer. The size of each fragment is defined by buffersize minus a padding value
 	// obtained from the audio api.  This framesAvailable value is then the amount of buffer 
 	// to request to write to.  The actual data written is framesAvailable * align
 	// to access a packet of data.  A pointer variable is used to point to the data buffer
-	// Thsi is still all a bit non-native to me.
+	// This is still all a bit non-native to me.
+	// NOTE: Added in this example is some basic DSP functionality;  implemented as a basic
+	// AMPLITUDE modifier per sample to lower the overall volume of the sound file.
 	for (;;) 
 	{
-		// This STOPS playing audio
-		if (play == FALSE) { break; }
+		Sleep(1);//reduce cpu consumption
 
+		// This STOPS playing audio
+		if (play == FALSE)
+		{ 
+			break;
+		}
+
+		// Total frames is the length of the sample data / alignment
 		UINT totalFrames = size / align;
+
+		// If we have already reached the end of the file
 		if (framesProcessed > totalFrames) 
 		{
 			// If we want to loop this sample
-			if (loop == TRUE){
+			if (loop == TRUE)
+			{
 				framesProcessed = 0;  ptr = 0;
 			}
 			// if we have already processed all frames, break
-			else {
+			else 
+			{
 				break;
 			}
 		}
@@ -294,8 +286,39 @@ DWORD WINAPI ThreadFn(LPVOID lParam)
 		UINT writeCount = framesAvailable * align;
 		//
 		//
+		// ------------------ DSP WORK ------------------ //
+		// ------------------ Amplitude Scaling --------- //
+		DWORD* mem = (DWORD*)calloc(writeCount, sizeof(DWORD));
+		if (mem == NULL) break;
+		// copy n-size samples
+		memcpy(mem, &dat[ptr], writeCount);
+		// process n-size samples
+		for (int i = 0; i < writeCount; i++) 
+		{
+			// Get lower 2 bytes (this is left CH)
+			WORD leftch = LOWORD(mem[i]);
+			// Get upper 2 bytes (this is right CH)
+			WORD rightch = HIWORD(mem[i]);
+			// Get samples
+			// Note: _int16 to get the actual sample value
+			// Represent as double to manipulate properly
+			double rsample = (_int16)leftch;
+			double lsample = (_int16)rightch;
+			// Modify the samples by Amplitude Scaling
+			// y(n) = Ax(n) for -∞ < n < +∞
+			leftch = (WORD)(volume * lsample);
+			rightch = (WORD)(volume * rsample);
+			// Prepare packet
+			DWORD modifiedframe = MAKELONG(leftch, rightch);
+			// Write packet
+			mem[i] = modifiedframe;
+		}
+		// Copy new data to Audio Buffer, free temporary variables
+		memcpy_s(pData, writeCount, mem, writeCount);
+		free(mem);
+		// ------------------ END DSP ------------------ //
 		//
-		memcpy_s(pData, writeCount, &dat[ptr], writeCount);
+		//
 		// Calculate how much data we have processed
 		framesProcessed += framesAvailable;
 		// Point to next frame of data from audio file
@@ -304,6 +327,8 @@ DWORD WINAPI ThreadFn(LPVOID lParam)
 		StringCbPrintf(frames, flen*sizeof(TCHAR), L"%d", framesProcessed);
 		SendMessage(static1, WM_SETTEXT, 0, (LPARAM)frames);
 		// TESTING drawing text
+		// NOTE: there is flicker 
+		// TODO: how to solve?  double buffer?
 		RECT r;
 		GetClientRect(hwnd, &r);
 		r.left = 150;
@@ -400,7 +425,7 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 						catout(L"AudioClientDevicePeriod: ", hwnd);
 						catout(buff, hwnd);
 						catout(L"\r\n", hwnd);
-						catout(L"SUPPORTED: ", hwnd);
+						catout(L"DEFAULT: ", hwnd);
 						buff = IMMDevices.MixFormatToString(IMMDevices.GetAudioClientMixFormat());
 						catout(buff, hwnd);
 						catout(L"\r\n", hwnd);
@@ -473,7 +498,6 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					// Activate the AUDIO Client for the device
 					if (IMMDevices.ActivateAudioClient() == S_OK)
 					{
-
 						// Initialize the AUDIO engine
 						WAVEFORMATEX wf = IMMDevices.BuildWaveFormatEx(frmat, channels, bps, sps);
 						if (IMMDevices.Initialize(AUDCLNT_SHAREMODE_SHARED, 0, 1000, 0, &wf, NULL) == S_OK)
@@ -561,7 +585,17 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		r.top = 500;
 		r.right = 300;
 		r.bottom = 550;
-		int ret = DrawText(hdc, frames, -1, &r, DT_LEFT);
+		DrawText(hdc, frames, -1, &r, DT_LEFT);
+
+		RECT s;
+		SetRect(&s, 150, 520, 1000, 620);
+		FillRect(hdc, &s, (HBRUSH)(COLOR_WINDOW + 8));
+		HPEN pen = CreatePen(PS_SOLID, 1, RGB(220, 60, 150));
+		SelectObject(hdc, pen);
+		MoveToEx(hdc, 150, 570, NULL);
+		LineTo(hdc, 1000, 570);
+		DeleteObject(pen);
+
 		EndPaint(hWnd, &ps);
 	}
 	break;

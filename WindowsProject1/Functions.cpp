@@ -5,6 +5,7 @@
  *
  */
 void catout(LPCWSTR text, HWND hwnd) {
+	if (text == NULL) return;
 	int cCount = SendMessage(hwnd, WM_GETTEXTLENGTH, 0, 0);
 	int tCount = wcslen(text);
 	int fCount = cCount + tCount;

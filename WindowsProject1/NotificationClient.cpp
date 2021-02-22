@@ -123,6 +123,9 @@ HRESULT STDMETHODCALLTYPE IMMNotifyClient::QueryInterface(REFIID riid, VOID** pp
 }
 HRESULT STDMETHODCALLTYPE IMMNotifyClient::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId)
 {
+	// If the user has removed or disabled the default device for a particular role, 
+	// and no other device is available to assume that role, then pwstrDefaultDevice is NULL.
+	if (pwstrDeviceId == NULL) return S_OK;
 	IMMDeviceCollection* ppdevs;
 	ThroughSelect through;
 	this->_pEnumerator->EnumAudioEndpoints(EDataFlow::eAll, DEVICE_STATE_ACTIVE, &ppdevs);
