@@ -293,7 +293,7 @@ DWORD WINAPI ThreadFn(LPVOID lParam)
 		// copy n-size samples
 		memcpy(mem, &dat[ptr], writeCount);
 		// process n-size samples
-		for (int i = 0; i < writeCount; i++) 
+		for (unsigned int i = 0; i < writeCount; i++) 
 		{
 			// Get lower 2 bytes (this is left CH)
 			WORD leftch = LOWORD(mem[i]);
