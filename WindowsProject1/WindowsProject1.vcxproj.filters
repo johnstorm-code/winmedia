@@ -19,111 +19,117 @@
     <Filter Include="Source Files\IMMDevicesAPI">
       <UniqueIdentifier>{31efa8ce-5378-4594-a406-7b615a2b6e1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Application">
+      <UniqueIdentifier>{5c71fedd-2f47-459a-9045-aab21388cc2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Application">
+      <UniqueIdentifier>{4b2db0ec-61ec-458a-b588-208b1ce49bc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WinProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AboutHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Controls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NotificationClient.h">
+    <ClInclude Include="immdevicesapi\IMMAudioCaptureClientApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMDevicesAPI.h">
+    <ClInclude Include="immdevicesapi\IMMAudioClientApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMDeviceEnumerator.h">
+    <ClInclude Include="immdevicesapi\IMMAudioRenderClientApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMDeviceCollectionApi.h">
+    <ClInclude Include="immdevicesapi\IMMDeviceApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMDeviceApi.h">
+    <ClInclude Include="immdevicesapi\IMMDeviceCollectionApi.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="UI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IMMDevices.h">
+    <ClInclude Include="immdevicesapi\IMMDeviceEnumerator.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMAudioClientApi.h">
+    <ClInclude Include="immdevicesapi\IMMDevices.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMAudioRenderClientApi.h">
+    <ClInclude Include="immdevicesapi\IMMDevicesAPI.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="IMMAudioCaptureClientApi.h">
+    <ClInclude Include="immdevicesapi\NotificationClient.h">
       <Filter>Header Files\IMMDevicesAPI</Filter>
     </ClInclude>
-    <ClInclude Include="RegisterWindow.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="application\AboutHandler.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Application.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Constants.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Declarations.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Controls.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\framework.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\RegisterWindow.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Functions.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\targetver.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\resource.h">
+      <Filter>Header Files\Application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Controls.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AboutHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NotificationClient.cpp">
+    <ClCompile Include="immdevicessrc\IMMAudioCaptureClientApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMDevicesAPI.cpp">
+    <ClCompile Include="immdevicessrc\IMMAudioClientApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMDeviceApi.cpp">
+    <ClCompile Include="immdevicessrc\IMMAudioRenderClientApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMDeviceCollectionApi.cpp">
+    <ClCompile Include="immdevicessrc\IMMDeviceApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMDeviceEnumerator.cpp">
+    <ClCompile Include="immdevicessrc\IMMDeviceCollectionApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IPropertyStoreApi.cpp">
+    <ClCompile Include="immdevicessrc\IMMDeviceEnumerator.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMAudioClientApi.cpp">
+    <ClCompile Include="immdevicessrc\IMMDevicesAPI.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMAudioRenderClientApi.cpp">
+    <ClCompile Include="immdevicessrc\IPropertyStoreApi.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
     </ClCompile>
-    <ClCompile Include="IMMAudioCaptureClientApi.cpp">
+    <ClCompile Include="immdevicessrc\NotificationClient.cpp">
       <Filter>Source Files\IMMDevicesAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="applicationsrc\AboutHandler.cpp">
+      <Filter>Source Files\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="applicationsrc\Controls.cpp">
+      <Filter>Source Files\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="applicationsrc\Functions.cpp">
+      <Filter>Source Files\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="applicationsrc\Main.cpp">
+      <Filter>Source Files\Application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

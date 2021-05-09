@@ -1,4 +1,4 @@
-#include "IMMAudioCaptureClientApi.h"
+#include "../immdevicesapi/IMMAudioCaptureClientApi.h"
 
 /*
  IAudioCaptureClient

@@ -1,4 +1,4 @@
-#include "AboutHandler.h"
+#include "../application/AboutHandler.h"
 
 // Message handler for about box.
 INT_PTR CALLBACK MyAbout(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

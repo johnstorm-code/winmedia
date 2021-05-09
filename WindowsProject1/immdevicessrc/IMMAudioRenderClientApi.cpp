@@ -1,4 +1,4 @@
-#include "IMMAudioRenderClientApi.h"
+#include "../immdevicesapi/IMMAudioRenderClientApi.h"
 
 /*
 IAudioRenderClient doc

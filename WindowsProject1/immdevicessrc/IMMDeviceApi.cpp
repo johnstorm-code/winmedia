@@ -1,4 +1,4 @@
-#include "IMMDeviceApi.h"
+#include "../immdevicesapi/IMMDeviceApi.h"
 
 /*
 IMMDevice docs

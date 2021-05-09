@@ -1,6 +1,6 @@
 #pragma once
 
-#include "framework.h"
+#include "../application/framework.h"
 
 #define SAFE_RELEASE(punk)  \
               if ((punk) != NULL)  \

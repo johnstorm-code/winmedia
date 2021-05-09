@@ -1,4 +1,4 @@
-#include "Functions.h"
+#include "../application/Functions.h"
 
 /*
  * Concats strings to a control, essentially "filling" the control with data

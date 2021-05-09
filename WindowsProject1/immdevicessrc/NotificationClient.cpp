@@ -4,13 +4,13 @@
 https://docs.microsoft.com/en-us/windows/win32/api/mmdeviceapi/nn-mmdeviceapi-immnotificationclient
 */
 
-#include "NotificationClient.h"
-#include "resource.h"
-#include "Functions.h"
+#include "../immdevicesapi/NotificationClient.h"
+#include "../resource.h"
+#include "../application/Functions.h"
 
-#include "IMMDeviceCollectionApi.h"
-#include "IMMDeviceApi.h"
-#include "IPropertyStoreApi.h"
+#include "../immdevicesapi/IMMDeviceCollectionApi.h"
+#include "../immdevicesapi/IMMDeviceApi.h"
+#include "../immdevicesapi/IPropertyStoreApi.h"
 
 class ThroughSelect
 {

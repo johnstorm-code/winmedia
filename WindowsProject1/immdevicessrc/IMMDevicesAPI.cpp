@@ -1,5 +1,5 @@
-#include "IMMDevicesAPI.h"
-#include "Functions.h"
+#include "../immdevicesapi/IMMDevicesAPI.h"
+#include "../application/Functions.h"
 
 IMMDevicesApi::IMMDevicesApi()
 {

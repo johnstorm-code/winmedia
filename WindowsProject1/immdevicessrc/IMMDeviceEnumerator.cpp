@@ -1,4 +1,4 @@
-#include "IMMDeviceEnumerator.h"
+#include "../immdevicesapi/IMMDeviceEnumerator.h"
 
 /*
 IMMDeviceEnumerator

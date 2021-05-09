@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Functions.h"
+#include "../application/Functions.h"
 
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)

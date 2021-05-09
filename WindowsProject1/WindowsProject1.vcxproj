@@ -149,42 +149,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AboutHandler.h" />
-    <ClInclude Include="Constants.h" />
-    <ClInclude Include="Controls.h" />
-    <ClInclude Include="Declarations.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Functions.h" />
-    <ClInclude Include="IMMAudioCaptureClientApi.h" />
-    <ClInclude Include="IMMAudioClientApi.h" />
-    <ClInclude Include="IMMDeviceApi.h" />
-    <ClInclude Include="IMMDeviceCollectionApi.h" />
-    <ClInclude Include="IMMDeviceEnumerator.h" />
-    <ClInclude Include="IMMDevices.h" />
-    <ClInclude Include="IMMDevicesAPI.h" />
-    <ClInclude Include="IMMAudioRenderClientApi.h" />
-    <ClInclude Include="NotificationClient.h" />
-    <ClInclude Include="RegisterWindow.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="UI.h" />
+    <ClInclude Include="application\AboutHandler.h" />
+    <ClInclude Include="application\Application.h" />
+    <ClInclude Include="application\Constants.h" />
+    <ClInclude Include="application\Controls.h" />
+    <ClInclude Include="application\Declarations.h" />
+    <ClInclude Include="application\framework.h" />
+    <ClInclude Include="application\Functions.h" />
+    <ClInclude Include="application\RegisterWindow.h" />
+    <ClInclude Include="application\resource.h" />
+    <ClInclude Include="application\targetver.h" />
+    <ClInclude Include="application\UI.h" />
+    <ClInclude Include="immdevicesapi\IMMAudioCaptureClientApi.h" />
+    <ClInclude Include="immdevicesapi\IMMAudioClientApi.h" />
+    <ClInclude Include="immdevicesapi\IMMAudioRenderClientApi.h" />
+    <ClInclude Include="immdevicesapi\IMMDeviceApi.h" />
+    <ClInclude Include="immdevicesapi\IMMDeviceCollectionApi.h" />
+    <ClInclude Include="immdevicesapi\IMMDeviceEnumerator.h" />
+    <ClInclude Include="immdevicesapi\IMMDevices.h" />
+    <ClInclude Include="immdevicesapi\IMMDevicesAPI.h" />
+    <ClInclude Include="immdevicesapi\NotificationClient.h" />
     <ClInclude Include="WinProc.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AboutHandler.cpp" />
-    <ClCompile Include="Controls.cpp" />
-    <ClCompile Include="Functions.cpp" />
-    <ClCompile Include="IMMAudioCaptureClientApi.cpp" />
-    <ClCompile Include="IMMAudioClientApi.cpp" />
-    <ClCompile Include="IMMAudioRenderClientApi.cpp" />
-    <ClCompile Include="IMMDeviceApi.cpp" />
-    <ClCompile Include="IMMDeviceCollectionApi.cpp" />
-    <ClCompile Include="IMMDeviceEnumerator.cpp" />
-    <ClCompile Include="IMMDevicesAPI.cpp" />
-    <ClCompile Include="IPropertyStoreApi.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="NotificationClient.cpp" />
+    <ClCompile Include="applicationsrc\AboutHandler.cpp" />
+    <ClCompile Include="applicationsrc\Controls.cpp" />
+    <ClCompile Include="applicationsrc\Functions.cpp" />
+    <ClCompile Include="applicationsrc\Main.cpp" />
+    <ClCompile Include="immdevicessrc\IMMAudioCaptureClientApi.cpp" />
+    <ClCompile Include="immdevicessrc\IMMAudioClientApi.cpp" />
+    <ClCompile Include="immdevicessrc\IMMAudioRenderClientApi.cpp" />
+    <ClCompile Include="immdevicessrc\IMMDeviceApi.cpp" />
+    <ClCompile Include="immdevicessrc\IMMDeviceCollectionApi.cpp" />
+    <ClCompile Include="immdevicessrc\IMMDeviceEnumerator.cpp" />
+    <ClCompile Include="immdevicessrc\IMMDevicesAPI.cpp" />
+    <ClCompile Include="immdevicessrc\IPropertyStoreApi.cpp" />
+    <ClCompile Include="immdevicessrc\NotificationClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowsProject1.rc" />

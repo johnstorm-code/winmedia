@@ -5,15 +5,15 @@
 // Testing Windows Application
 // Learning windows/GUI-based programming
 
-#include "framework.h"
-#include "resource.h"
-#include "Constants.h"
-#include "Declarations.h"
-#include "RegisterWindow.h"
-#include "Application.h"
-#include "UI.h"
-#include "IMMDevicesAPI.h"
-#include "WinProc.h"
+#include "../application/framework.h"
+#include "../resource.h"
+#include "../application/Constants.h"
+#include "../application/Declarations.h"
+#include "../application/RegisterWindow.h"
+#include "../application/Application.h"
+#include "../application/UI.h"
+#include "../immdevicesapi/IMMDevicesAPI.h"
+#include "../application/WinProc.h"
 
 // Main Entry
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow){

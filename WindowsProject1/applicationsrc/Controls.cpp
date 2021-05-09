@@ -1,4 +1,4 @@
-#include "Controls.h"
+#include "../application/Controls.h"
 
 /* Use this area to implement functions that create controls */
 

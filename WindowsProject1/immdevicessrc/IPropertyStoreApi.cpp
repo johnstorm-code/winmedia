@@ -1,4 +1,4 @@
-#include "IPropertyStoreApi.h"
+#include "../immdevicesapi/IPropertyStoreApi.h"
 
 /*
 IPropertyStore doc
