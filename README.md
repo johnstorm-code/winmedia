@@ -1,3 +1,3 @@
 # winmedia
 
-Attempts to wrap some windows media functions
+This was an attempt to wrap windows audio stuff like enumerating devices and playing basic wav files 
